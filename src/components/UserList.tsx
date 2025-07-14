@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectFilteredUsers, selectFavorites } from '../store/users/selectors';
-import { toggleFavoriteUser } from '../store/users/actions';
-import styled from 'styled-components';
-import { RootState } from '../store';
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { selectFilteredUsers, selectFavorites } from "../store/users/selectors";
+import { toggleFavoriteUser } from "../store/users/actions";
+import styled from "styled-components";
+import { RootState } from "../store";
 
 const SearchInput = styled.input`
   width: 100%;
@@ -42,60 +42,66 @@ const Spinner = styled.div`
   margin: 2rem auto;
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
-
 
 type UserListProps = {
   onUserClick: (id: number, name: string) => void;
 };
 
-const UserList = ({ onUserClick }:UserListProps) => {
+const UserList = ({ onUserClick }: UserListProps) => {
   const dispatch = useDispatch();
   const users = useSelector(selectFilteredUsers);
   const favorites = useSelector(selectFavorites);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const loading = useSelector((state: RootState) => state.users.loading);
 
+  return (
+    <>
+      <SearchInput
+        placeholder="Buscar por nome..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
 
- return (
-  <>
-    <SearchInput
-      placeholder="Buscar por nome..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-    />
-
-    {loading ? (
-      <Spinner />
-    ) : (
-      users
-        .filter((user) =>
-          user.name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-        .map((user) => (
-          <UserCard key={user.id} onClick={() => onUserClick(user.id, user.name)}>
-            <strong>{user.name} - {user.username}</strong>
-            <p>Email: {user.email}</p>
-            <p>Telefone: {user.phone}</p>
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                dispatch(toggleFavoriteUser(user));
-              }}
+      {loading ? (
+        <Spinner />
+      ) : (
+        users
+          .filter((user) =>
+            user.name.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+          .map((user) => (
+            <UserCard
+              key={user.id}
+              onClick={() => onUserClick(user.id, user.name)}
             >
-              {favorites.some((fav) => fav.id === user.id)
-                ? '★ Remover'
-                : '☆ Favoritar'}
-            </Button>
-          </UserCard>
-        ))
-    )}
-  </>
-);
-
+              <strong>
+                {user.name} - {user.username}
+              </strong>
+              <p>E-mail: {user.email}</p>
+              <p>Telefone: {user.phone}</p>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(toggleFavoriteUser(user));
+                }}
+              >
+                {favorites.some((fav) => fav.id === user.id)
+                  ? "✖ Remover"
+                  : "★ Favoritar"}
+              </Button>
+            </UserCard>
+          ))
+      )}
+    </>
+  );
 };
 
 export default UserList;
